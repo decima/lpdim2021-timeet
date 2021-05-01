@@ -55,7 +55,6 @@ export default class extends Controller {
     }
 
     send() {
-        console.log(this.inputTarget.value);
         fetch(this.pushurlTarget.value, {
             method: 'POST', // *GET, POST, PUT, DELETE, etc.
             headers: {

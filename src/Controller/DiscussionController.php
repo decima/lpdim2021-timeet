@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Discussion;
 use App\Entity\Message;
 use App\Repository\DiscussionRepository;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,11 +23,16 @@ class DiscussionController extends AbstractController
     }
 
     #[ROute("/discussion/new", name: "discussion_new")]
-    public function newDiscussion(EntityManagerInterface $entityManager)
+    public function newDiscussion(EntityManagerInterface $entityManager, UserRepository $userRepository)
     {
         $discussion = new Discussion();
         $this->getUser()->addDiscussion($discussion);
-        $this->getUser()->addDiscussion($discussion);
+        do {
+            $users = $userRepository->findAll();
+            $user = $users[rand(0, count($users))];
+            $discussion->addParticipant($user);
+        } while ($user->getId() != $this->getUser()->getId());
+
         $entityManager->persist($discussion);
         $entityManager->flush();
         return $this->redirectToRoute("discussions");
@@ -54,7 +60,7 @@ class DiscussionController extends AbstractController
     }
 
     #[Route('/discussion/{discussion}', name: 'push', methods: ["POST"])]
-    public function push(Discussion $discussion, Request $request): Response
+    public function push(Discussion $discussion, Request $request, EntityManagerInterface $entityManager): Response
     {
         if ($discussion->getEndsAt()->getTimestamp() < time()) {
             return new Response("End of chat", 403);
@@ -63,7 +69,9 @@ class DiscussionController extends AbstractController
         $msg->setAuthor($this->getUser());
         $msg->setContent(json_decode($request->getContent()));
         $msg->setCreatedAt(new \DateTime());
-
+        $msg->setDiscussion($discussion);
+        $entityManager->persist($msg);
+        $entityManager->flush();
         return new Response("ok", 200);
     }
 
