@@ -31,7 +31,7 @@ class DiscussionController extends AbstractController
             $users = $userRepository->findAll();
             $user = $users[rand(0, count($users)-1)];
             $discussion->addParticipant($user);
-        } while ($user->getId() != $this->getUser()->getId());
+        } while ($user->getId() == $this->getUser()->getId());
 
         $entityManager->persist($discussion);
         $entityManager->flush();
