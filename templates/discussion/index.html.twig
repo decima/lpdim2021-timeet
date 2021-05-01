@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello DiscussionController!{% endblock %}
+
+{% block body %}
+    <div><h1>Discussions</h1></div>
+    <a href="{{ path("discussion_new") }}">Start new random discussion</a>
+    <table>
+        {% for discussion in discussions %}
+            <tr>
+                <td>
+                    <a href="{{ path("discussion",{"discussion":discussion.id}) }}">
+                        {% set difference = discussion.endsAt.diff(date("now")) %}
+                        {% if difference.days %}
+                            {{ difference.days }} days
+                        {% endif %}
+                        {% if difference.h %}
+                            {{ difference.h }} hours
+                        {% endif %}
+
+                        {% if difference.i %}
+                            {{ difference.i }} minutes
+                        {% endif %}
+                        {% if difference.s %}
+                            {{ difference.s }} seconds
+                        {% endif %}
+                        left
+                    </a>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

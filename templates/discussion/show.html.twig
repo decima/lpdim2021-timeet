@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+    <div data-controller="discussion">
+        <input type="hidden" data-discussion-target="pullurl" value="{{ path("pull",{discussion:discussion.id}) }}"/>
+        <input type="hidden" data-discussion-target="pushurl" value="{{ path("push",{discussion:discussion.id}) }}"/>
+        <input type="hidden" data-discussion-target="userid" value="{{ app.user.id }}"/>
+        <h2 data-discussion-target="timeleft"
+            data-timeleft="{{ discussion.endsAt|date("c") }}">{{ discussion.endsAt|date("c") }}</h2>
+        <hr/>
+        <div data-discussion-target="output">
+            {% for message in discussion.messages %}
+                <div style="
+                {% if message.author.id == app.user.id %}
+                        color:blue;
+                {% else %}
+                        color:green;
+                {% endif %}
+                        ">
+                    {{ message.content }}
+                    <span style="float:right;">{{ message.createdAt|date("Y-m-d H:i:s") }}</span>
+                    <hr/>
+                </div>
+            {% endfor %}
+        </div>
+
+        <input type="text" name="message" data-discussion-target="input">
+        <button type="submit" data-action="click->discussion#send">Send message</button>
+
+    </div>
+{% endblock %}
+
+{% block title %}
+
+{% endblock %}
+

@@ -1,0 +1,44 @@
+{% extends "base.html.twig" %}
+{% block body %}
+    <h1>Define your profile</h1>
+    <form action="#" method="post">
+        <div data-controller="likes">
+            {{ _self.hobbies(topLevelHobbies) }}
+            <input name="likes" data-likes-target="outputlikes" type="text" value="{{ likes|json_encode }}"/>
+            <input name="dislikes" data-likes-target="outputdislikes" type="text" value="{{ dislikes|json_encode }}"/>
+        </div>
+        <button type="submit" class="">Save likes</button>
+    </form>
+
+
+{% endblock %}
+
+
+
+    {% macro hobbies(categories=[]) %}
+        <ul>
+            {% for category in categories %}
+                <li data-controller="hobbies" data-ref="{{ category.name }}">
+                    {% if category.children|length>0 %}
+                        <a style="cursor: pointer" data-action="click->hobbies#toggle">
+                            <i data-hobbies-target="indicator" class="fas fa-caret-right"></i>
+                            {{ category.name }}
+                        </a>
+                    {% else %}
+                        <a>{{ category.name }}</a>
+
+                    {% endif %}
+
+                    <i style="cursor: pointer" data-action="click->likes#like" data-id="{{ category.id }}"
+                       data-name="{{ category.name }}"
+                       class="like fal fa-thumbs-up"></i>
+                    <i style="cursor: pointer" data-action="click->likes#dislike" data-id="{{ category.id }}"
+                       data-name="{{ category.name }}"
+                       class="dislike fal fa-thumbs-down"></i>
+                    <div data-hobbies-target="subcategories">
+                        {{ _self.hobbies(category.children) }}
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endmacro %}
